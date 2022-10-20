@@ -15,6 +15,8 @@ npm install
 and
 
 ```
+yx:首选 node_modules\.bin\webpack
+
 npm run-script build
 ```
 
