@@ -16,7 +16,7 @@ and
 
 ```
 yx:首选 node_modules\.bin\webpack
-
+编译为ts可调用文件  tsc ./src/fpCollect.js --allowJS --outDir dist --target ES2022 --declaration --sourceMap
 npm run-script build
 ```
 

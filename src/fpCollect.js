@@ -1,4 +1,4 @@
-const fpCollect = (function () {
+export const fpCollect = (function () {
     const UNKNOWN = 'unknown';
     const ERROR = 'error';
 
@@ -484,12 +484,8 @@ const fpCollect = (function () {
             });
         });
     };
-
     return {
         addCustomFunction: addCustomFunction,
         generateFingerprint: generateFingerprint,
     };
-
 })();
-
-module.exports = fpCollect;

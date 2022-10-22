@@ -19,7 +19,8 @@ const config = {
     output: {
         path: `${__dirname}/dist`,
         filename: outputFile,
-        library: libraryName
+        library: libraryName,
+        libraryTarget: 'umd',
     },
     module: {
         loaders: [
