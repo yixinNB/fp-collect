@@ -1,9 +1,8 @@
-import {fpjs} from './fpjs/fp.esm'
-console.log(fpjs())
+import { fpjs } from './fpjs/fp.esm';
+console.log(fpjs());
 export const fpCollect = (function () {
     const UNKNOWN = 'unknown';
     const ERROR = 'error';
-
     const DEFAULT_ATTRIBUTES = {
         plugins: false,
         mimeTypes: false,
@@ -39,7 +38,6 @@ export const fpCollect = (function () {
         audioCodecs: false,
         videoCodecs: false
     };
-
     const defaultAttributeToFunction = {
         userAgent: () => {
             return navigator.userAgent;
@@ -103,15 +101,16 @@ export const fpCollect = (function () {
             let touchEvent = false;
             if (typeof navigator.maxTouchPoints !== "undefined") {
                 maxTouchPoints = navigator.maxTouchPoints;
-            } else if (typeof navigator.msMaxTouchPoints !== "undefined") {
+            }
+            else if (typeof navigator.msMaxTouchPoints !== "undefined") {
                 maxTouchPoints = navigator.msMaxTouchPoints;
             }
             try {
                 document.createEvent("TouchEvent");
                 touchEvent = true;
-            } catch (_) {
             }
-
+            catch (_) {
+            }
             const touchStart = "ontouchstart" in window;
             return [maxTouchPoints, touchEvent, touchStart];
         },
@@ -123,12 +122,14 @@ export const fpCollect = (function () {
                 if (ctx.getSupportedExtensions().indexOf("WEBGL_debug_renderer_info") >= 0) {
                     webGLVendor = ctx.getParameter(ctx.getExtension('WEBGL_debug_renderer_info').UNMASKED_VENDOR_WEBGL);
                     webGLRenderer = ctx.getParameter(ctx.getExtension('WEBGL_debug_renderer_info').UNMASKED_RENDERER_WEBGL);
-                } else {
+                }
+                else {
                     webGLVendor = "Not supported";
                     webGLRenderer = "Not supported";
                 }
                 return [webGLVendor, webGLRenderer];
-            } catch (e) {
+            }
+            catch (e) {
                 return "Not supported;;;Not supported";
             }
         },
@@ -139,37 +140,38 @@ export const fpCollect = (function () {
                     "audioinput": 0,
                     "videoinput": 0
                 };
-
                 if (navigator.mediaDevices && navigator.mediaDevices.enumerateDevices
                     && navigator.mediaDevices.enumerateDevices.name !== "bound reportBlock") {
                     // bound reportBlock occurs with Brave
                     navigator.mediaDevices.enumerateDevices().then((devices) => {
                         if (typeof devices !== "undefined") {
-                        let name;
-                        for (let i = 0; i < devices.length; i++) {
-                            name = [devices[i].kind];
-                            deviceToCount[name] = deviceToCount[name] + 1;
+                            let name;
+                            for (let i = 0; i < devices.length; i++) {
+                                name = [devices[i].kind];
+                                deviceToCount[name] = deviceToCount[name] + 1;
+                            }
+                            resolve({
+                                speakers: deviceToCount.audiooutput,
+                                micros: deviceToCount.audioinput,
+                                webcams: deviceToCount.videoinput
+                            });
                         }
-                        resolve({
-                            speakers: deviceToCount.audiooutput,
-                            micros: deviceToCount.audioinput,
-                            webcams: deviceToCount.videoinput
-                        });
-                        } else {
+                        else {
                             resolve({
                                 speakers: 0,
                                 micros: 0,
                                 webcams: 0
                             });
                         }
-
                     });
-                } else if (navigator.mediaDevices && navigator.mediaDevices.enumerateDevices
+                }
+                else if (navigator.mediaDevices && navigator.mediaDevices.enumerateDevices
                     && navigator.mediaDevices.enumerateDevices.name === "bound reportBlock") {
                     resolve({
                         'devicesBlockedByBrave': true
                     });
-                } else {
+                }
+                else {
                     resolve({
                         speakers: 0,
                         micros: 0,
@@ -184,11 +186,11 @@ export const fpCollect = (function () {
         navigatorPrototype: () => {
             let obj = window.navigator;
             const protoNavigator = [];
-            do Object.getOwnPropertyNames(obj).forEach((name) => {
-                protoNavigator.push(name);
-            });
+            do
+                Object.getOwnPropertyNames(obj).forEach((name) => {
+                    protoNavigator.push(name);
+                });
             while (obj = Object.getPrototypeOf(obj));
-
             let res;
             const finalProto = [];
             protoNavigator.forEach((prop) => {
@@ -196,7 +198,8 @@ export const fpCollect = (function () {
                 if (objDesc !== undefined) {
                     if (objDesc.value !== undefined) {
                         res = objDesc.value.toString();
-                    } else if (objDesc.get !== undefined) {
+                    }
+                    else if (objDesc.get !== undefined) {
                         res = objDesc.get.toString();
                     }
                 }
@@ -213,7 +216,8 @@ export const fpCollect = (function () {
         screenDesc: () => {
             try {
                 return Object.getOwnPropertyDescriptor(Object.getPrototypeOf(screen), "width").get.toString();
-            } catch (e) {
+            }
+            catch (e) {
                 return ERROR;
             }
         },
@@ -258,7 +262,8 @@ export const fpCollect = (function () {
             const errors = [];
             try {
                 azeaze + 3;
-            } catch (e) {
+            }
+            catch (e) {
                 errors.push(e.message);
                 errors.push(e.fileName);
                 errors.push(e.lineNumber);
@@ -267,14 +272,15 @@ export const fpCollect = (function () {
                 errors.push(e.columnNumber);
                 try {
                     errors.push(e.toSource().toString());
-                } catch (e) {
+                }
+                catch (e) {
                     errors.push(undefined);
                 }
             }
-
             try {
                 new WebSocket('itsgonnafail');
-            } catch (e) {
+            }
+            catch (e) {
                 errors.push(e.message);
             }
             return errors;
@@ -284,26 +290,24 @@ export const fpCollect = (function () {
             let errorMessage = '';
             let errorName = '';
             let errorStacklength = 0;
-
             function iWillBetrayYouWithMyLongName() {
                 try {
                     depth++;
                     iWillBetrayYouWithMyLongName();
-                } catch (e) {
+                }
+                catch (e) {
                     errorMessage = e.message;
                     errorName = e.name;
                     errorStacklength = e.stack.toString().length;
                 }
             }
-
             iWillBetrayYouWithMyLongName();
             return {
                 depth: depth,
                 errorMessage: errorMessage,
                 errorName: errorName,
                 errorStacklength: errorStacklength
-            }
-
+            };
         },
         accelerometerUsed: () => {
             return new Promise((resolve) => {
@@ -312,7 +316,6 @@ export const fpCollect = (function () {
                         return resolve(true);
                     }
                 };
-
                 setTimeout(() => {
                     return resolve(false);
                 }, 300);
@@ -325,49 +328,47 @@ export const fpCollect = (function () {
             return !!window.chrome;
         },
         detailChrome: () => {
-            if (!window.chrome) return UNKNOWN;
-
+            if (!window.chrome)
+                return UNKNOWN;
             const res = {};
-
-            try{
+            try {
                 ["webstore", "runtime", "app", "csi", "loadTimes"].forEach((property) => {
                     res[property] = window.chrome[property].constructor.toString().length;
                 });
-            } catch (e) {
+            }
+            catch (e) {
                 res.properties = UNKNOWN;
             }
-
             try {
                 window.chrome.runtime.connect('');
-            } catch (e) {
+            }
+            catch (e) {
                 res.connect = e.message.length;
             }
             try {
                 window.chrome.runtime.sendMessage();
-            } catch (e) {
+            }
+            catch (e) {
                 res.sendMessage = e.message.length;
             }
-
             return res;
         },
         permissions: () => {
             return new Promise((resolve) => {
-                navigator.permissions.query({name: 'notifications'}).then((val) => {
+                navigator.permissions.query({ name: 'notifications' }).then((val) => {
                     resolve({
                         state: val.state,
                         permission: Notification.permission
-                    })
+                    });
                 });
-            })
+            });
         },
         iframeChrome: () => {
             const iframe = document.createElement('iframe');
             iframe.srcdoc = 'blank page';
             document.body.appendChild(iframe);
-
             const result = typeof iframe.contentWindow.chrome;
             iframe.remove();
-
             return result;
         },
         debugTool: () => {
@@ -395,12 +396,12 @@ export const fpCollect = (function () {
                         canvasCtx.drawImage(img, 0, 0);
                         resolve(canvasCtx.getImageData(0, 0, 1, 1).data);
                     };
-
                     img.onerror = () => {
                         resolve(ERROR);
                     };
                     img.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAC0lEQVQYV2NgAAIAAAUAAarVyFEAAAAASUVORK5CYII=';
-                } catch (e) {
+                }
+                catch (e) {
                     resolve(ERROR);
                 }
             });
@@ -410,7 +411,6 @@ export const fpCollect = (function () {
         },
         audioCodecs: () => {
             const audioElt = document.createElement("audio");
-
             if (audioElt.canPlayType) {
                 return {
                     ogg: audioElt.canPlayType('audio/ogg; codecs="vorbis"'),
@@ -418,7 +418,7 @@ export const fpCollect = (function () {
                     wav: audioElt.canPlayType('audio/wav; codecs="1"'),
                     m4a: audioElt.canPlayType('audio/x-m4a;'),
                     aac: audioElt.canPlayType('audio/aac;'),
-                }
+                };
             }
             return {
                 ogg: UNKNOWN,
@@ -430,27 +430,24 @@ export const fpCollect = (function () {
         },
         videoCodecs: () => {
             const videoElt = document.createElement("video");
-
             if (videoElt.canPlayType) {
                 return {
                     ogg: videoElt.canPlayType('video/ogg; codecs="theora"'),
                     h264: videoElt.canPlayType('video/mp4; codecs="avc1.42E01E"'),
                     webm: videoElt.canPlayType('video/webm; codecs="vp8, vorbis"'),
-                }
+                };
             }
             return {
                 ogg: UNKNOWN,
                 h264: UNKNOWN,
                 webm: UNKNOWN,
-            }
+            };
         }
     };
-
     const addCustomFunction = function (name, isAsync, f) {
         DEFAULT_ATTRIBUTES[name] = isAsync;
         defaultAttributeToFunction[name] = f;
     };
-
     const generateFingerprint = function () {
         return new Promise((resolve) => {
             const promises = [];
@@ -468,12 +465,14 @@ export const fpCollect = (function () {
                                 message: e.toString()
                             };
                             return resolve();
-                        })
+                        });
                     }));
-                } else {
+                }
+                else {
                     try {
                         fingerprint[attribute] = defaultAttributeToFunction[attribute]();
-                    } catch (e) {
+                    }
+                    catch (e) {
                         fingerprint[attribute] = {
                             error: true,
                             message: e.toString()
@@ -486,15 +485,12 @@ export const fpCollect = (function () {
             });
         });
     };
-    addCustomFunction("test",false,()=>{
-        return "this is a test"
-    })
-
-
-
-
+    addCustomFunction("test", false, () => {
+        return "this is a test";
+    });
     return {
         addCustomFunction: addCustomFunction,
         generateFingerprint: generateFingerprint,
     };
 })();
+//# sourceMappingURL=fpCollect.js.map
